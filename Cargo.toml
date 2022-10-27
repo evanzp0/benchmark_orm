@@ -3,8 +3,6 @@ name = "benchmark_orm"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 criterion = { version = "0.4", features = ["async_tokio", "async", "async_futures"] }
 dysql = "0.4"
@@ -16,6 +14,12 @@ tokio-postgres = { version = "0.7", features = ["with-chrono-0_4"] }
 tokio-pg-mapper = "0.2"
 tokio-pg-mapper-derive = "0.2"
 deadpool-postgres = "0.10"
+sea-orm = { version = "0.10", features = [ "sqlx-postgres", "runtime-tokio-native-tls", "macros" ] }
+
+serde = { version = "1", features = ["derive"] }
+rbs = { version = "0.1"}
+rbatis = { version = "4.0"}
+rbdc-pg={version="0.1"}
 
 [[bench]]
 name = "bench_main"

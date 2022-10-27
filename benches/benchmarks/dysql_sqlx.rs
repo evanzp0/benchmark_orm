@@ -34,7 +34,8 @@ async fn connect_db() -> Pool<Postgres> {
     conn
 }
 
-async fn fetch_all_user(conn: &Pool<Postgres>) -> dysql::DySqlResult<Vec<User>> {
+#[inline]
+async fn fetch_all_user_simple(conn: &Pool<Postgres>) -> dysql::DySqlResult<Vec<User>> {
     let dto = UserDto{ id: None, name: None, age: Some(15) };
     let users = fetch_all!(|dto, conn| -> User {
         "SELECT * FROM test_user"
@@ -43,18 +44,47 @@ async fn fetch_all_user(conn: &Pool<Postgres>) -> dysql::DySqlResult<Vec<User>> 
     Ok(users)
 }
 
+#[inline]
+async fn fetch_all_user_complex(conn: &Pool<Postgres>) -> dysql::DySqlResult<Vec<User>> {
+    let dto =  UserDto{ id: None, name: Some("zhangsan".to_owned()), age: Some(35) };
+    let users = fetch_all!(|dto, conn| -> User {
+        r#"SELECT * FROM test_user 
+        WHERE 1 = 1
+          {{#name}}AND name = :name{{/name}}
+          {{#age}}AND age = :age{{/age}}
+        ORDER BY id"#
+    });
+
+    Ok(users)
+}
+
+#[inline]
 fn bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("dysql_sqlx");
     let rt  = Runtime::new().unwrap();
     let conn = rt.block_on(connect_db());
 
-    group.bench_function("iter", |b| {
+    group.bench_function("simple", |b| {
         b.iter_custom(|iters| {
             rt.block_on(async {
                 let start = Instant::now();
                 for _ in 0..iters {
                     criterion::black_box(
-                        fetch_all_user(&conn).await.unwrap()
+                        fetch_all_user_simple(&conn).await.unwrap()
+                    );
+                }
+                start.elapsed()
+            })
+        });
+    });
+
+    group.bench_function("complex", |b| {
+        b.iter_custom(|iters| {
+            rt.block_on(async {
+                let start = Instant::now();
+                for _ in 0..iters {
+                    criterion::black_box(
+                        fetch_all_user_complex(&conn).await.unwrap()
                     );
                 }
                 start.elapsed()

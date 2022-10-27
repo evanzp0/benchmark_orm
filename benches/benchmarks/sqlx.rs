@@ -37,7 +37,7 @@ fn bench(c: &mut Criterion) {
     let rt  = Runtime::new().unwrap();
     let conn = rt.block_on(connect_db());
 
-    group.bench_function("iter", |b| {
+    group.bench_function("simple", |b| {
         b.iter_custom(|iters| {
             rt.block_on(async {
                 // take the start time inside the future to make sure we only count once it's running
