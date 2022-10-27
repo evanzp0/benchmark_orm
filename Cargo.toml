@@ -1,0 +1,22 @@
+[package]
+name = "benchmark_orm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+criterion = { version = "0.4", features = ["async_tokio", "async", "async_futures"] }
+dysql = "0.4"
+dysql-macro = { path = "/home/evan/workspace/dysql-project/dysql-macro", features = ["sqlx"] }
+sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" , "postgres"] }
+tokio = { version = "1.0", features = ["full"] }
+ramhorns = "0.14"
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4"] }
+tokio-pg-mapper = "0.2"
+tokio-pg-mapper-derive = "0.2"
+deadpool-postgres = "0.10"
+
+[[bench]]
+name = "bench_main"
+harness = false
